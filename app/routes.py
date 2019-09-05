@@ -155,12 +155,12 @@ def user_posts(username):
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    msg = Message('Password reset Request', sender='khedekarg9@gmail.com', recipients=[user.email])
-    msg.body = ''' To reset your password , visit following link
-{url_for('reset_token' , token={} , _external=True)}
-    
-    If you did not make request , ignore this mail
-    '''
+    msg = Message('Password reset Request', sender='noreply@demo.com', recipients=[user.email])
+    msg.body = '''
+    To reset your password , please click on following link
+    {}
+    If you did not make this request please ignore this
+    '''.format(url_for('reset_token', token=token, _external=True))
     mail.send(msg)
 
 
@@ -173,10 +173,10 @@ def reset_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
-        flash('Email has been sent with insructions to reset password', 'info')
-        return redirect({url_for('login')})
+        flash('Email has been sent with instructions to reset password', 'info')
+        return redirect(url_for('login'))
 
-    return  render_template('reset_request.html', title='Reset Password' , form=form)
+    return render_template('reset_request.html', title='Reset Password' , form=form)
 
 @flaskAppInstance.route("/reset_password/<token>",methods=["GET","POST"])
 def reset_token(token):
@@ -191,6 +191,6 @@ def reset_token(token):
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        flash('Your password has been updated. You are now able to log in'.format(form.username.data), 'success')
+        flash('Your password has been updated. You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('reset_token.html',title='Reset Password' , form=form)
