@@ -1,3 +1,7 @@
 testing merge
 
+<<<<<<< HEAD
 first test
+=======
+for flask-app-dev branch
+>>>>>>> flask-app-dev
